@@ -11,9 +11,11 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping(path = "/customer")
+@CrossOrigin
 public class CustomerController {
     @Autowired
     private CustomerRepository customerRepository;
@@ -40,11 +42,7 @@ public class CustomerController {
 
     @GetMapping("/phone-number/{phoneNumber}")
     public Customer getCustomerByPhoneNumber(@PathVariable("phoneNumber") String phoneNumber) throws IOException {
-        CustomerEntity entityAux = new CustomerEntity();
-        entityAux.setPhoneNumber(phoneNumber);
-        CustomerEntity entity = customerRepository.findOne(Example.of(entityAux)).get();
-        if (entity != null)
-            return new Customer(entity);
-        return null;
+        CustomerEntity entityAux = customerRepository.findFirstByPhoneNumber(phoneNumber);
+        return (entityAux != null) ? new Customer(entityAux) : null;
     }
 }
