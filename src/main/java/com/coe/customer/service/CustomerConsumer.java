@@ -38,4 +38,19 @@ public class CustomerConsumer {
     public void deleteCustomer(ConsumerRecord<Long, Integer> record) throws IOException {
         customerRepository.deleteById(record.value());
     }
+
+    @KafkaListener(topics = "customer-status-topic", groupId = "group-json")
+    public void statusCustomer(ConsumerRecord<Long, Customer> record) throws IOException {
+        Customer aux = record.value();
+        if (aux.getStatus().equals("OFFLINE") || aux.getStatus().equals("ONLINE")
+        ) {
+            CustomerEntity entity = customerRepository.findById(aux.getId()).orElse(null);
+            if (entity != null) {
+                entity.setStatus(aux.getStatus());
+                entity.setLastTimeOnline(new Date());
+                customerRepository.save(entity);
+            }
+        }
+
+    }
 }
