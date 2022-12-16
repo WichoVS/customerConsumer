@@ -25,8 +25,10 @@ public class CustomerController {
         if (idCustomer <= 0)
             return null;
 
-        CustomerEntity customerEntity = customerRepository.findById(idCustomer).get();
-        return new Customer(customerEntity);
+        CustomerEntity customerEntity = customerRepository.findById(idCustomer).orElse(null);
+        if (customerEntity != null)
+            return new Customer(customerEntity);
+        return null;
     }
 
     @GetMapping("")
